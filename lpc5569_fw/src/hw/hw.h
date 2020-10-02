@@ -18,6 +18,9 @@ extern "C" {
 
 
 #include "led.h"
+#include "swtimer.h"
+#include "button.h"
+
 
 
 void hwInit(void);

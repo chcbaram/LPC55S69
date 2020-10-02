@@ -14,10 +14,13 @@
 
 static volatile uint32_t systick_counter = 0;
 
+extern void swtimerISR(void);
+
 
 void SysTick_Handler(void)
 {
   systick_counter++;
+  swtimerISR();
 }
 
 
