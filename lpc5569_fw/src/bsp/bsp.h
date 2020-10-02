@@ -21,6 +21,8 @@ extern "C" {
 #include "config/board/peripherals.h"
 
 
+#include "fsl_usart.h"
+
 
 #define logPrintf(...)    printf(__VA_ARGS__)
 

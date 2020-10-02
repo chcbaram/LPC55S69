@@ -9,12 +9,14 @@
 
 
 #include "bsp.h"
-
+#
 
 
 static volatile uint32_t systick_counter = 0;
 
 extern void swtimerISR(void);
+extern void uartPutch(uint8_t channel, uint8_t ch);
+
 
 
 void SysTick_Handler(void)
@@ -36,6 +38,13 @@ void bspInit(void)
 
 void bspDeInit(void)
 {
+}
+
+int __io_putchar(int ch)
+{
+  uartPutch(_DEF_UART1, ch);
+
+  return 1;
 }
 
 void delay(uint32_t ms)

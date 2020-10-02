@@ -6,9 +6,35 @@
 #ifndef _PERIPHERALS_H_
 #define _PERIPHERALS_H_
 
+/***********************************************************************************************************************
+ * Included files
+ **********************************************************************************************************************/
+#include "fsl_common.h"
+#include "fsl_reset.h"
+#include "fsl_usart.h"
+#include "fsl_clock.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
+
+/***********************************************************************************************************************
+ * Definitions
+ **********************************************************************************************************************/
+/* Definitions for BOARD_InitPeripherals functional group */
+/* Definition of peripheral ID */
+#define FLEXCOMM0_PERIPHERAL ((USART_Type *)FLEXCOMM0)
+/* Definition of the clock source frequency */
+#define FLEXCOMM0_CLOCK_SOURCE 48000000UL
+/* FLEXCOMM0 interrupt vector ID (number). */
+#define FLEXCOMM0_FLEXCOMM_IRQN FLEXCOMM0_IRQn
+/* FLEXCOMM0 interrupt handler identifier. */
+#define FLEXCOMM0_FLEXCOMM_IRQHANDLER FLEXCOMM0_IRQHandler
+
+/***********************************************************************************************************************
+ * Global variables
+ **********************************************************************************************************************/
+extern const usart_config_t FLEXCOMM0_config;
 
 /***********************************************************************************************************************
  * Initialization functions

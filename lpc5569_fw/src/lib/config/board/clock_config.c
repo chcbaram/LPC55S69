@@ -56,13 +56,24 @@ void BOARD_InitBootClocks(void)
 name: BOARD_BootClockRUN
 called_from_default_init: true
 outputs:
+- {id: FXCOM0_clock.outFreq, value: 48 MHz, locked: true, accuracy: '0.001'}
 - {id: System_clock.outFreq, value: 100 MHz, locked: true, accuracy: '0.001'}
 settings:
 - {id: PLL0_Mode, value: Normal}
+- {id: ANALOG_CONTROL_FRO192M_CTRL_ENDI_FRO_96M_CFG, value: Enable}
+- {id: SYSCON.FCCLKSEL0.sel, value: SYSCON.FROHFDIV}
+- {id: SYSCON.FRGCTRL0_DIV.scale, value: '256', locked: true}
+- {id: SYSCON.FROHFDIV.scale, value: '2', locked: true}
 - {id: SYSCON.MAINCLKSELB.sel, value: SYSCON.PLL0_BYPASS}
 - {id: SYSCON.PLL0CLKSEL.sel, value: ANACTRL.fro_12m_clk}
-- {id: SYSCON.PLL0M_MULT.scale, value: '100'}
-- {id: SYSCON.PLL0N_DIV.scale, value: '3'}
+- {id: SYSCON.PLL0DIV.scale, value: '1', locked: true}
+- {id: SYSCON.PLL0M_MULT.scale, value: '100', locked: true}
+- {id: SYSCON.PLL0N_DIV.scale, value: '3', locked: true}
+- {id: SYSCON.PLL0_PDEC.scale, value: '4', locked: true}
+- {id: SYSCON.PLL1CLKSEL.sel, value: ANACTRL.fro_12m_clk}
+- {id: SYSCON.PLL1M_MULT.scale, value: '32'}
+sources:
+- {id: ANACTRL.fro_hf.outFreq, value: 96 MHz}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 
@@ -81,6 +92,8 @@ void BOARD_BootClockRUN(void)
     CLOCK_SetupFROClocking(12000000U);                   /*!< Set up FRO to the 12 MHz, just for sure */
     CLOCK_AttachClk(kFRO12M_to_MAIN_CLK);                /*!< Switch to FRO 12MHz first to ensure we can change the clock setting */
 
+    CLOCK_SetupFROClocking(96000000U);                   /* Enable FRO HF(96MHz) output */
+
     POWER_SetVoltageForFreq(100000000U);                  /*!< Set voltage for the one of the fastest clock outputs: System clock output */
     CLOCK_SetFLASHAccessCyclesForFreq(100000000U);          /*!< Set FLASH wait states for core */
 
@@ -98,11 +111,18 @@ void BOARD_BootClockRUN(void)
     };
     CLOCK_SetPLL0Freq(&pll0Setup);                       /*!< Configure PLL0 to the desired values */
 
+    /*!< PLL1 is in power_down mode */
+
     /*!< Set up dividers */
+    CLOCK_SetClkDiv(kCLOCK_DivFlexFrg0, 0U, true);               /*!< Reset FRGCTRL0_DIV divider counter and halt it */
+    CLOCK_SetClkDiv(kCLOCK_DivFlexFrg0, 256U, false);         /*!< Set FRGCTRL0_DIV divider to value 256 */
     CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, false);         /*!< Set AHBCLKDIV divider to value 1 */
+    CLOCK_SetClkDiv(kCLOCK_DivFrohfClk, 0U, true);               /*!< Reset FROHFDIV divider counter and halt it */
+    CLOCK_SetClkDiv(kCLOCK_DivFrohfClk, 2U, false);         /*!< Set FROHFDIV divider to value 2 */
 
     /*!< Set up clock selectors - Attach clocks to the peripheries */
     CLOCK_AttachClk(kPLL0_to_MAIN_CLK);                 /*!< Switch MAIN_CLK to PLL0 */
+    CLOCK_AttachClk(kFRO_HF_DIV_to_FLEXCOMM0);                 /*!< Switch FLEXCOMM0 to FRO_HF_DIV */
 
     /*< Set SystemCoreClock variable. */
     SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;

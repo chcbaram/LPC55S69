@@ -30,6 +30,9 @@ void apMain(void)
     {
       pre_time = millis();
       ledToggle(_DEF_LED1);
+
+      uartPrintf(_DEF_UART1, "test \n");
+      printf("printf\n");
     }
 
     if (buttonGetPressed(2) == true)
@@ -39,6 +42,11 @@ void apMain(void)
     else
     {
       ledOff(_DEF_LED2);
+    }
+
+    if (uartAvailable(_DEF_UART1) > 0)
+    {
+      uartPrintf(_DEF_UART1, "rx %x \n", uartRead(_DEF_UART1));
     }
   }
 }
